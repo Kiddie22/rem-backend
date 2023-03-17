@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { User } from './user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +14,16 @@ export class AuthService {
 
   async signUp(authCredentialsDto: AuthCredentialsDto): Promise<string> {
     const { username, password } = authCredentialsDto;
-    const user = this.usersRepository.create({ username, password });
+
+    //hash password
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = this.usersRepository.create({
+      username,
+      password: hashedPassword,
+    });
+
     await this.usersRepository.save(user);
     return 'success';
   }
@@ -21,9 +31,10 @@ export class AuthService {
   async login(authCredentialsDto: AuthCredentialsDto): Promise<string> {
     const { username, password } = authCredentialsDto;
     const user = await this.usersRepository.findOneBy({ username });
-    if (!user) {
+    if (user && (await bcrypt.compare(password, user.password))) {
+      return 'logged in';
+    } else {
       throw new UnauthorizedException('Please check your login credentials');
     }
-    return 'logged in';
   }
 }
