@@ -7,6 +7,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm/dist';
+import { AuthHelpersService } from './auth-helpers.service';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { TypeOrmModule } from '@nestjs/typeorm/dist';
       signOptions: { expiresIn: 3600 },
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, AuthHelpersService, JwtStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
