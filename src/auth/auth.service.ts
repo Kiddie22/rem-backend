@@ -6,6 +6,12 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthHelpersService } from './auth-helpers.service';
 
+export type AuthPromiseReturnType = Promise<{
+  accessToken: string;
+  statusCode: number;
+  username: string;
+}>;
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -15,9 +21,7 @@ export class AuthService {
     private authHelpersService: AuthHelpersService,
   ) {}
 
-  async signUp(
-    authCredentialsDto: AuthCredentialsDto,
-  ): Promise<{ accessToken: string; statusCode: number; username: string }> {
+  async signUp(authCredentialsDto: AuthCredentialsDto): AuthPromiseReturnType {
     const { username, email, password } = authCredentialsDto;
     const hashedPassword = await this.authHelpersService.hashPassword(password);
     const user = this.usersRepository.create({
@@ -37,9 +41,7 @@ export class AuthService {
     }
   }
 
-  async login(
-    authCredentialsDto: AuthCredentialsDto,
-  ): Promise<{ accessToken: string; statusCode: number; username: string }> {
+  async login(authCredentialsDto: AuthCredentialsDto): AuthPromiseReturnType {
     const { username, password } = authCredentialsDto;
     const user = await this.usersRepository.findOneBy({ username });
     if (
