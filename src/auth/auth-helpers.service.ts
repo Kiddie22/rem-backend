@@ -8,14 +8,18 @@ import * as bcrypt from 'bcrypt';
 import { JwtPayload } from 'src/auth/jwt-payload.interface';
 
 @Injectable()
-export class AuthHelpersService {
-  async hashPassword(password: string): Promise<string> {
+export default class AuthHelpersService {
+  static async hashPassword({
+    password,
+  }: {
+    password: string;
+  }): Promise<string> {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
     return hashedPassword;
   }
 
-  async comparePassword(
+  static async comparePassword(
     inputPassword: string,
     userPassword: string,
   ): Promise<boolean> {
@@ -23,15 +27,15 @@ export class AuthHelpersService {
     return isEqual;
   }
 
-  createAccessToken(username: string, jwtService: JwtService): string {
+  static createAccessToken(username: string, jwtService: JwtService): string {
     const payload: JwtPayload = { username };
     const accessToken = jwtService.sign(payload);
     return accessToken;
   }
 
-  throwErrorMessage(error): void {
+  static throwErrorMessage(error): void {
     if (error.code === '23505') {
-      //duplicate values
+      // duplicate values
       const errorLog = error.detail;
       if (errorLog.includes('Key (email)')) {
         throw new ConflictException(

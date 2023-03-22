@@ -1,9 +1,9 @@
-import { AuthPromiseReturnType, AuthService } from './auth.service';
 import { Body, Post, Controller } from '@nestjs/common';
-import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { AuthPromiseReturnType, AuthService } from './auth.service';
+import AuthCredentialsDto from './dto/auth-credentials.dto';
 
 @Controller('auth')
-export class AuthController {
+export default class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('/signup')

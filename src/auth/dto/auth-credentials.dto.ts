@@ -6,7 +6,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class AuthCredentialsDto {
+export default class AuthCredentialsDto {
   @IsString()
   @MinLength(4, {
     message: 'Username too short.',

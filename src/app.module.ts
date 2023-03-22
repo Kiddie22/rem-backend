@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from './auth/auth.module';
-import { PropertiesModule } from './properties/properties.module';
+import AuthModule from './auth/auth.module';
+import PropertiesModule from './properties/properties.module';
 
 @Module({
   imports: [
@@ -19,4 +19,4 @@ import { PropertiesModule } from './properties/properties.module';
     PropertiesModule,
   ],
 })
-export class AppModule {}
+export default class AppModule {}

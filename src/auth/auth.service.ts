@@ -1,10 +1,10 @@
-import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthHelpersService } from './auth-helpers.service';
+import AuthCredentialsDto from './dto/auth-credentials.dto';
+import User from './user.entity';
+import AuthHelpersService from './auth-helpers.service';
 
 export type AuthPromiseReturnType = Promise<{
   accessToken: string;
@@ -23,7 +23,9 @@ export class AuthService {
 
   async signUp(authCredentialsDto: AuthCredentialsDto): AuthPromiseReturnType {
     const { username, email, password } = authCredentialsDto;
-    const hashedPassword = await this.authHelpersService.hashPassword(password);
+    const hashedPassword = await AuthHelpersService.hashPassword({
+      password,
+    });
     const user = this.usersRepository.create({
       username,
       email,
@@ -31,13 +33,14 @@ export class AuthService {
     });
     try {
       await this.usersRepository.save(user);
-      const accessToken = this.authHelpersService.createAccessToken(
+      const accessToken = AuthHelpersService.createAccessToken(
         username,
         this.jwtService,
       );
       return { accessToken, statusCode: 201, username };
     } catch (error) {
-      this.authHelpersService.throwErrorMessage(error);
+      AuthHelpersService.throwErrorMessage(error);
+      return null;
     }
   }
 
@@ -46,15 +49,14 @@ export class AuthService {
     const user = await this.usersRepository.findOneBy({ username });
     if (
       user &&
-      (await this.authHelpersService.comparePassword(password, user.password))
+      (await AuthHelpersService.comparePassword(password, user.password))
     ) {
-      const accessToken = this.authHelpersService.createAccessToken(
+      const accessToken = AuthHelpersService.createAccessToken(
         username,
         this.jwtService,
       );
       return { accessToken, statusCode: 200, username };
-    } else {
-      throw new UnauthorizedException('Please check your login credentials');
     }
+    throw new UnauthorizedException('Please check your login credentials');
   }
 }

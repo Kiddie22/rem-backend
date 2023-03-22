@@ -1,10 +1,10 @@
 import { AuthGuard } from '@nestjs/passport';
-import { PropertiesService } from './properties.service';
-import { CreatePropertyDto } from './dto/create-property.dto';
 import { Post, Controller, Body, UseGuards } from '@nestjs/common';
+import PropertiesService from './properties.service';
+import CreatePropertyDto from './dto/create-property.dto';
 
 @Controller('properties')
-export class PropertiesController {
+export default class PropertiesController {
   constructor(private propertiesService: PropertiesService) {}
 
   @UseGuards(AuthGuard('jwt'))

@@ -1,13 +1,13 @@
-import { User } from './user.entity';
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from './constants';
-import { AuthService } from './auth.service';
-import { JwtStrategy } from './jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
-import { AuthController } from './auth.controller';
 import { TypeOrmModule } from '@nestjs/typeorm/dist';
-import { AuthHelpersService } from './auth-helpers.service';
+import User from './user.entity';
+import jwtConstants from './constants';
+import { AuthService } from './auth.service';
+import JwtStrategy from './jwt.strategy';
+import AuthController from './auth.controller';
+import AuthHelpersService from './auth-helpers.service';
 
 @Module({
   imports: [
@@ -21,4 +21,4 @@ import { AuthHelpersService } from './auth-helpers.service';
   providers: [AuthService, AuthHelpersService, JwtStrategy],
   controllers: [AuthController],
 })
-export class AuthModule {}
+export default class AuthModule {}
