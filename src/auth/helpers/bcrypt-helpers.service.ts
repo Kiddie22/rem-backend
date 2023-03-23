@@ -9,7 +9,7 @@ export default class BcryptHelpersService {
     return hashedPassword;
   }
 
-  static async comparePassword(
+  static async compare(
     inputPassword: string,
     userPassword: string,
   ): Promise<boolean> {

@@ -46,7 +46,7 @@ export default class UsersService {
 
   async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.usersRepository.findOneBy({ id });
-    user.refreshToken = updateUserDto.refresh_token;
+    user.refreshToken = updateUserDto.refreshToken;
     this.usersRepository.save(user);
     return user;
   }

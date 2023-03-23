@@ -5,7 +5,7 @@ import { JwtPayload } from 'src/auth/jwt-payload.interface';
 import User from 'src/users/entities/user.entity';
 import UsersService from 'src/users/users.service';
 import jwtConstants from '../constants';
-import BcryptHelpersService from './bcrypt-helpers.service';
+import Argon2HelpersClass from './argon2-helpers.service';
 
 @Injectable()
 export default class JwtHelpersService {
@@ -19,7 +19,7 @@ export default class JwtHelpersService {
     const payload: JwtPayload = { id, username };
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: jwtConstants.access_secret,
-      expiresIn: '10m',
+      expiresIn: '15m',
     });
     return accessToken;
   }
@@ -35,11 +35,9 @@ export default class JwtHelpersService {
   }
 
   async updateRefreshToken(id: string, refreshToken: string): Promise<void> {
-    const hashedRefreshToken = await BcryptHelpersService.hashPassword(
-      refreshToken,
-    );
+    const hashedRefreshToken = await Argon2HelpersClass.hashToken(refreshToken);
     await this.usersService.updateUser(id, {
-      refresh_token: hashedRefreshToken,
+      refreshToken: hashedRefreshToken,
     });
   }
 
@@ -53,11 +51,17 @@ export default class JwtHelpersService {
 
   async refreshTokens(
     id: string,
+    refreshToken: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.usersService.getUserById(id);
     if (!user || !user.refreshToken) {
       throw new ForbiddenException('Access Denied');
     }
+    const refreshTokenMatches = await Argon2HelpersClass.verifyToken(
+      user.refreshToken,
+      refreshToken,
+    );
+    if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
     const tokens = await this.getTokens(user);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
     return tokens;

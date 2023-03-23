@@ -39,7 +39,7 @@ export class AuthService {
     const user = await this.usersService.getUserByUsername(username);
     if (
       !user ||
-      !(await BcryptHelpersService.comparePassword(password, user.password))
+      !(await BcryptHelpersService.compare(password, user.password))
     ) {
       throw new BadRequestException('Invalid credentials');
     }
@@ -52,6 +52,6 @@ export class AuthService {
   }
 
   async logout(id: string): Promise<User> {
-    return this.usersService.updateUser(id, { refresh_token: null });
+    return this.usersService.updateUser(id, { refreshToken: null });
   }
 }
