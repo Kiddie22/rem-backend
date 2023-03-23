@@ -1,10 +1,4 @@
-import {
-  IsEmail,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsString, MaxLength, MinLength } from 'class-validator';
 
 export default class AuthCredentialsDto {
   @IsString()
@@ -15,10 +9,6 @@ export default class AuthCredentialsDto {
     message: 'Username too long.',
   })
   username: string;
-
-  @IsEmail({}, { message: 'Valid email not provided.' })
-  @IsOptional()
-  email: string;
 
   @IsString()
   @MinLength(8, {

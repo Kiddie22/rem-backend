@@ -1,5 +1,6 @@
 const jwtConstants = {
-  secret: '$3cReT',
+  access_secret: '$3cReT',
+  refresh_secret: '!@VXSA&',
 };
 
 export default jwtConstants;

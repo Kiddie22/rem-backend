@@ -1,62 +1,57 @@
-import { Repository } from 'typeorm';
-import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import UsersService from 'src/users/users.service';
+import CreateUserDto from 'src/users/dto/create-user.dto';
+import User from 'src/users/entities/user.entity';
 import AuthCredentialsDto from './dto/auth-credentials.dto';
-import User from './user.entity';
-import AuthHelpersService from './auth-helpers.service';
+import BcryptHelpersService from './helpers/bcrypt-helpers.service';
+import JwtHelpersService from './helpers/jwt-helpers.service';
 
 export type AuthPromiseReturnType = Promise<{
   accessToken: string;
-  statusCode: number;
-  username: string;
+  refreshToken: string;
 }>;
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
-    private jwtService: JwtService,
-    private authHelpersService: AuthHelpersService,
+    private usersService: UsersService,
+    private jwtHelpersService: JwtHelpersService,
   ) {}
 
-  async signUp(authCredentialsDto: AuthCredentialsDto): AuthPromiseReturnType {
-    const { username, email, password } = authCredentialsDto;
-    const hashedPassword = await AuthHelpersService.hashPassword({
-      password,
-    });
-    const user = this.usersRepository.create({
-      username,
-      email,
+  async signUp(createUserDto: CreateUserDto): AuthPromiseReturnType {
+    const hashedPassword = await BcryptHelpersService.hashPassword(
+      createUserDto.password,
+    );
+    const user = await this.usersService.createUser({
+      ...createUserDto,
       password: hashedPassword,
     });
-    try {
-      await this.usersRepository.save(user);
-      const accessToken = AuthHelpersService.createAccessToken(
-        username,
-        this.jwtService,
-      );
-      return { accessToken, statusCode: 201, username };
-    } catch (error) {
-      AuthHelpersService.throwErrorMessage(error);
-      return null;
-    }
+    const tokens = await this.jwtHelpersService.getTokens(user);
+    await this.jwtHelpersService.updateRefreshToken(
+      user.id,
+      tokens.refreshToken,
+    );
+    return tokens;
   }
 
   async login(authCredentialsDto: AuthCredentialsDto): AuthPromiseReturnType {
     const { username, password } = authCredentialsDto;
-    const user = await this.usersRepository.findOneBy({ username });
+    const user = await this.usersService.getUserByUsername(username);
     if (
-      user &&
-      (await AuthHelpersService.comparePassword(password, user.password))
+      !user ||
+      !(await BcryptHelpersService.comparePassword(password, user.password))
     ) {
-      const accessToken = AuthHelpersService.createAccessToken(
-        username,
-        this.jwtService,
-      );
-      return { accessToken, statusCode: 200, username };
+      throw new BadRequestException('Invalid credentials');
     }
-    throw new UnauthorizedException('Please check your login credentials');
+    const tokens = await this.jwtHelpersService.getTokens(user);
+    await this.jwtHelpersService.updateRefreshToken(
+      user.id,
+      tokens.refreshToken,
+    );
+    return tokens;
+  }
+
+  async logout(id: string): Promise<User> {
+    return this.usersService.updateUser(id, { refresh_token: null });
   }
 }
