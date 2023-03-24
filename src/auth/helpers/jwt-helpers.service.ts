@@ -6,6 +6,7 @@ import User from 'src/users/entities/user.entity';
 import UsersService from 'src/users/users.service';
 import jwtConstants from '../constants';
 import Argon2HelpersClass from './argon2-helpers.service';
+import AuthHelpersService from './auth-helpers.service';
 
 @Injectable()
 export default class JwtHelpersService {
@@ -24,9 +25,9 @@ export default class JwtHelpersService {
     return accessToken;
   }
 
-  async createRefreshToken(user: User): Promise<string> {
+  async createRefreshToken(user: User, hashedKey: string): Promise<string> {
     const { id, username } = user;
-    const payload: JwtPayload = { id, username };
+    const payload: JwtPayload = { id, username, hashedKey };
     const refreshToken = await this.jwtService.signAsync(payload, {
       secret: jwtConstants.refresh_secret,
       expiresIn: '7d',
@@ -43,16 +44,20 @@ export default class JwtHelpersService {
 
   async getTokens(
     user: User,
+    hashedKey: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const accessToken = await this.createAccessToken(user);
-    const refreshToken = await this.createRefreshToken(user);
+    const refreshToken = await this.createRefreshToken(user, hashedKey);
     return { accessToken, refreshToken };
   }
 
   async refreshTokens(
     id: string,
     refreshToken: string,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): Promise<{
+    tokens: { accessToken: string; refreshToken: string };
+    secret: string;
+  }> {
     const user = await this.usersService.getUserById(id);
     if (!user || !user.refreshToken) {
       throw new ForbiddenException('Access Denied');
@@ -62,8 +67,10 @@ export default class JwtHelpersService {
       refreshToken,
     );
     if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
-    const tokens = await this.getTokens(user);
+    const secret = AuthHelpersService.generateString(32);
+    const hashedKey = await Argon2HelpersClass.hashToken(secret);
+    const tokens = await this.getTokens(user, hashedKey);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
-    return tokens;
+    return { tokens, secret };
   }
 }

@@ -8,6 +8,11 @@ import { AuthService } from './auth.service';
 import AuthCredentialsDto from './dto/auth-credentials.dto';
 import JwtHelpersService from './helpers/jwt-helpers.service';
 
+type ControllerReturnType = Promise<{
+  accessToken: string;
+  refreshToken: string;
+}>;
+
 @Controller('auth')
 export default class AuthController {
   constructor(
@@ -19,26 +24,24 @@ export default class AuthController {
   async signUp(
     @Body() createUserDto: CreateUserDto,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<{ accessToken: string }> {
-    const tokens = await this.authService.signUp(createUserDto);
-    const { accessToken, refreshToken } = tokens;
-    response.cookie('refresh-token', refreshToken, {
+  ): ControllerReturnType {
+    const { tokens, secret } = await this.authService.signUp(createUserDto);
+    response.cookie('secret', secret, {
       httpOnly: true,
     });
-    return { accessToken };
+    return tokens;
   }
 
   @Post('/login')
   async login(
     @Body() authCredentialsDto: AuthCredentialsDto,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<{ accessToken: string }> {
-    const tokens = await this.authService.login(authCredentialsDto);
-    const { accessToken, refreshToken } = tokens;
-    response.cookie('refresh-token', refreshToken, {
+  ): ControllerReturnType {
+    const { tokens, secret } = await this.authService.login(authCredentialsDto);
+    response.cookie('secret', secret, {
       httpOnly: true,
     });
-    return { accessToken };
+    return tokens;
   }
 
   @Get('/logout')
@@ -53,14 +56,16 @@ export default class AuthController {
   async refreshTokens(
     @GetUser() user: { user: User; refreshToken: string },
     @Res({ passthrough: true }) response: Response,
-  ): Promise<{ accessToken: string }> {
+  ): ControllerReturnType {
     const { id } = user.user;
     const { refreshToken } = user;
-    const tokens = await this.jwtHelpersService.refreshTokens(id, refreshToken);
-    response.cookie('refresh-token', tokens.refreshToken, {
+    const { tokens, secret } = await this.jwtHelpersService.refreshTokens(
+      id,
+      refreshToken,
+    );
+    response.cookie('secret', secret, {
       httpOnly: true,
     });
-    const { accessToken } = tokens;
-    return { accessToken };
+    return tokens;
   }
 }

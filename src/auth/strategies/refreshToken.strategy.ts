@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import User from 'src/users/entities/user.entity';
 import jwtConstants from '../constants';
 import { JwtPayload } from '../jwt-payload.interface';
+import Argon2HelpersClass from '../helpers/argon2-helpers.service';
 
 @Injectable()
 export default class RefreshTokenStrategy extends PassportStrategy(
@@ -24,13 +25,7 @@ export default class RefreshTokenStrategy extends PassportStrategy(
     super({
       secretOrKey: jwtConstants.refresh_secret,
       passReqToCallback: true,
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: Request): string => {
-          const refreshToken = request.cookies['refresh-token'];
-          if (!refreshToken) return null;
-          return refreshToken;
-        },
-      ]),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     });
   }
 
@@ -38,10 +33,12 @@ export default class RefreshTokenStrategy extends PassportStrategy(
     req: Request,
     payload: JwtPayload,
   ): Promise<{ user: User; refreshToken: string }> {
-    const { id } = payload;
-    const refreshToken = req.cookies['refresh-token'];
-    if (!refreshToken) {
-      throw new BadRequestException('Invalid token');
+    const { id, hashedKey } = payload;
+    const { secret } = req.cookies;
+    const refreshToken = req.get('Authorization').replace('Bearer', '').trim();
+    const secretsMatch = Argon2HelpersClass.verifyToken(hashedKey, secret);
+    if (!secret || !secretsMatch) {
+      throw new BadRequestException('Invalid secret');
     }
     const user: User = await this.usersRepository.findOneBy({ id });
     if (!user) {

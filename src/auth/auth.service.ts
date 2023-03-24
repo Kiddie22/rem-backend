@@ -5,10 +5,12 @@ import User from 'src/users/entities/user.entity';
 import AuthCredentialsDto from './dto/auth-credentials.dto';
 import BcryptHelpersService from './helpers/bcrypt-helpers.service';
 import JwtHelpersService from './helpers/jwt-helpers.service';
+import Argon2HelpersClass from './helpers/argon2-helpers.service';
+import AuthHelpersService from './helpers/auth-helpers.service';
 
 export type AuthPromiseReturnType = Promise<{
-  accessToken: string;
-  refreshToken: string;
+  tokens: { accessToken: string; refreshToken: string };
+  secret: string;
 }>;
 
 @Injectable()
@@ -26,12 +28,14 @@ export class AuthService {
       ...createUserDto,
       password: hashedPassword,
     });
-    const tokens = await this.jwtHelpersService.getTokens(user);
+    const secret = AuthHelpersService.generateString(32);
+    const hashedKey = await Argon2HelpersClass.hashToken(secret);
+    const tokens = await this.jwtHelpersService.getTokens(user, hashedKey);
     await this.jwtHelpersService.updateRefreshToken(
       user.id,
       tokens.refreshToken,
     );
-    return tokens;
+    return { tokens, secret };
   }
 
   async login(authCredentialsDto: AuthCredentialsDto): AuthPromiseReturnType {
@@ -43,12 +47,14 @@ export class AuthService {
     ) {
       throw new BadRequestException('Invalid credentials');
     }
-    const tokens = await this.jwtHelpersService.getTokens(user);
+    const secret = AuthHelpersService.generateString(32);
+    const hashedKey = await Argon2HelpersClass.hashToken(secret);
+    const tokens = await this.jwtHelpersService.getTokens(user, hashedKey);
     await this.jwtHelpersService.updateRefreshToken(
       user.id,
       tokens.refreshToken,
     );
-    return tokens;
+    return { tokens, secret };
   }
 
   async logout(id: string): Promise<User> {
