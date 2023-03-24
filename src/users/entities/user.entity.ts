@@ -13,9 +13,10 @@ export default class User {
   email: string;
 
   @Column()
+  @Exclude({ toPlainOnly: true })
   password: string;
 
   @Column({ nullable: true })
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   refreshToken?: string;
 }
