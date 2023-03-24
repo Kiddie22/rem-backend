@@ -1,7 +1,11 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import User from 'src/users/entities/user.entity';
@@ -20,7 +24,13 @@ export default class RefreshTokenStrategy extends PassportStrategy(
     super({
       secretOrKey: jwtConstants.refresh_secret,
       passReqToCallback: true,
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request: Request): string => {
+          const refreshToken = request.cookies['refresh-token'];
+          if (!refreshToken) return null;
+          return refreshToken;
+        },
+      ]),
     });
   }
 
@@ -29,7 +39,10 @@ export default class RefreshTokenStrategy extends PassportStrategy(
     payload: JwtPayload,
   ): Promise<{ user: User; refreshToken: string }> {
     const { id } = payload;
-    const refreshToken = req.get('Authorization').replace('Bearer', '').trim();
+    const refreshToken = req.cookies['refresh-token'];
+    if (!refreshToken) {
+      throw new BadRequestException('Invalid token');
+    }
     const user: User = await this.usersRepository.findOneBy({ id });
     if (!user) {
       throw new UnauthorizedException();

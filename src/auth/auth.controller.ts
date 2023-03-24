@@ -19,39 +19,48 @@ export default class AuthController {
   async signUp(
     @Body() createUserDto: CreateUserDto,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<string> {
+  ): Promise<{ accessToken: string }> {
     const tokens = await this.authService.signUp(createUserDto);
-    response.cookie('refreshToken', tokens.refreshToken, {
+    const { accessToken, refreshToken } = tokens;
+    response.cookie('refresh-token', refreshToken, {
       httpOnly: true,
     });
-    return tokens.accessToken;
+    return { accessToken };
   }
 
   @Post('/login')
   async login(
     @Body() authCredentialsDto: AuthCredentialsDto,
     @Res({ passthrough: true }) response: Response,
-  ): Promise<string> {
+  ): Promise<{ accessToken: string }> {
     const tokens = await this.authService.login(authCredentialsDto);
-    response.cookie('refreshToken', tokens.refreshToken, {
+    const { accessToken, refreshToken } = tokens;
+    response.cookie('refresh-token', refreshToken, {
       httpOnly: true,
     });
-    return tokens.accessToken;
+    return { accessToken };
   }
 
   @Get('/logout')
   @UseGuards(AuthGuard('jwt'))
-  logout(@GetUser() user: User): Promise<User> {
-    return this.authService.logout(user.id);
+  logout(@GetUser() user: User): { message: string } {
+    this.authService.logout(user.id);
+    return { message: 'Logged out' };
   }
 
   @Get('/refresh')
   @UseGuards(AuthGuard('jwt-refresh'))
-  refreshTokens(
+  async refreshTokens(
     @GetUser() user: { user: User; refreshToken: string },
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<{ accessToken: string }> {
     const { id } = user.user;
     const { refreshToken } = user;
-    return this.jwtHelpersService.refreshTokens(id, refreshToken);
+    const tokens = await this.jwtHelpersService.refreshTokens(id, refreshToken);
+    response.cookie('refresh-token', tokens.refreshToken, {
+      httpOnly: true,
+    });
+    const { accessToken } = tokens;
+    return { accessToken };
   }
 }
