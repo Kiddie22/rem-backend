@@ -34,7 +34,7 @@ export default class SessionsService {
 
   async updateSession(sessionId: string): Promise<Session> {
     const session = await this.getSessionById(sessionId);
-    session.expiredAt = Date.now() + 300000;
+    session.expiredAt = Date.now() + 900000;
     await this.sesssionsRepository.save(session);
     return session;
   }

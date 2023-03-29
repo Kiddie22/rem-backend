@@ -12,7 +12,7 @@ export default class Session {
   createdAt = Date.now();
 
   @Column('bigint')
-  expiredAt = Date.now() + 300000;
+  expiredAt = Date.now() + 900000;
 
   @Column()
   isValid: boolean;

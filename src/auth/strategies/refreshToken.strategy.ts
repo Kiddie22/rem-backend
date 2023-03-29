@@ -36,6 +36,7 @@ export default class RefreshTokenStrategy extends PassportStrategy(
   ): Promise<{ user: User; sessionId: string }> {
     const { id, sessionId } = payload;
     const user = await this.usersService.getUserById(id);
+    // payload does not contain required data
     if (!user || !sessionId) throw new UnauthorizedException();
     const session = await this.sessionsService.getSessionById(sessionId);
     if (user.id !== session.userId || !session.isValid)
@@ -44,6 +45,7 @@ export default class RefreshTokenStrategy extends PassportStrategy(
       this.sessionsService.revokeSession(sessionId);
       throw new UnauthorizedException();
     }
+    // cleanup invalid sessions of user
     this.sessionsService.sessionCleanup(user.id);
     return { user, sessionId };
   }
