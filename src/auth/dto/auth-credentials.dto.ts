@@ -1,10 +1,5 @@
-import {
-  IsEmail,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsString, MaxLength, MinLength, Validate } from 'class-validator';
+import MaxPasswordLength from '../utils/password-custom-validator';
 
 export default class AuthCredentialsDto {
   @IsString()
@@ -16,16 +11,10 @@ export default class AuthCredentialsDto {
   })
   username: string;
 
-  @IsEmail({}, { message: 'Valid email not provided.' })
-  @IsOptional()
-  email: string;
-
   @IsString()
   @MinLength(8, {
     message: 'Password too short.',
   })
-  @MaxLength(32, {
-    message: 'Password too long.',
-  })
+  @Validate(MaxPasswordLength)
   password: string;
 }
