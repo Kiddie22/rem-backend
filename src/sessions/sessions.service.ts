@@ -45,9 +45,4 @@ export default class SessionsService {
       isValid: false,
     });
   }
-
-  // async removeSession(sessionId: string): Promise<void> {
-  //   await this.getSessionById(sessionId);
-  //   this.sesssionsRepository.delete({ sessionId });
-  // }
 }

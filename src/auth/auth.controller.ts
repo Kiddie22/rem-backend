@@ -6,6 +6,7 @@ import User from 'src/users/entities/user.entity';
 import GetUser from 'src/users/get-user.decorator';
 import { AuthService } from './auth.service';
 import AuthCredentialsDto from './dto/auth-credentials.dto';
+import AuthHelpersService from './utils/auth-helpers.service';
 import JwtHelpersService from './utils/jwt-helpers.service';
 
 type ControllerReturnType = Promise<{
@@ -29,6 +30,7 @@ export default class AuthController {
     );
     response.cookie('refresh-token', refreshToken, {
       httpOnly: true,
+      expires: AuthHelpersService.returnTokenExpiryDate(),
     });
     return { accessToken };
   }
@@ -43,6 +45,7 @@ export default class AuthController {
     );
     response.cookie('refresh-token', refreshToken, {
       httpOnly: true,
+      expires: AuthHelpersService.returnTokenExpiryDate(),
     });
     return { accessToken };
   }
@@ -67,6 +70,7 @@ export default class AuthController {
       await this.jwtHelpersService.refreshTokens(user, sessionId);
     response.cookie('refresh-token', refreshToken, {
       httpOnly: true,
+      expires: AuthHelpersService.returnTokenExpiryDate(),
     });
     return { accessToken };
   }
