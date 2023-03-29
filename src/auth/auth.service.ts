@@ -1,16 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import UsersService from 'src/users/users.service';
 import CreateUserDto from 'src/users/dto/create-user.dto';
-import User from 'src/users/entities/user.entity';
+import SessionsService from 'src/sessions/sessions.service';
 import AuthCredentialsDto from './dto/auth-credentials.dto';
-import BcryptHelpersService from './helpers/bcrypt-helpers.service';
-import JwtHelpersService from './helpers/jwt-helpers.service';
-import Argon2HelpersClass from './helpers/argon2-helpers.service';
-import AuthHelpersService from './helpers/auth-helpers.service';
+import BcryptHelpersService from './utils/bcrypt-helpers.service';
+import JwtHelpersService from './utils/jwt-helpers.service';
 
 export type AuthPromiseReturnType = Promise<{
-  tokens: { accessToken: string; refreshToken: string };
-  secret: string;
+  accessToken: string;
+  refreshToken: string;
 }>;
 
 @Injectable()
@@ -18,6 +16,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtHelpersService: JwtHelpersService,
+    private sessionsService: SessionsService,
   ) {}
 
   async signUp(createUserDto: CreateUserDto): AuthPromiseReturnType {
@@ -28,14 +27,14 @@ export class AuthService {
       ...createUserDto,
       password: hashedPassword,
     });
-    const secret = AuthHelpersService.generateString(32);
-    const hashedKey = await Argon2HelpersClass.hashToken(secret);
-    const tokens = await this.jwtHelpersService.getTokens(user, hashedKey);
-    await this.jwtHelpersService.updateRefreshToken(
-      user.id,
-      tokens.refreshToken,
+    const session = await this.sessionsService.createSession({
+      userId: user.id,
+    });
+    const tokens = await this.jwtHelpersService.getTokens(
+      user,
+      session.sessionId,
     );
-    return { tokens, secret };
+    return tokens;
   }
 
   async login(authCredentialsDto: AuthCredentialsDto): AuthPromiseReturnType {
@@ -47,17 +46,17 @@ export class AuthService {
     ) {
       throw new BadRequestException('Invalid credentials');
     }
-    const secret = AuthHelpersService.generateString(32);
-    const hashedKey = await Argon2HelpersClass.hashToken(secret);
-    const tokens = await this.jwtHelpersService.getTokens(user, hashedKey);
-    await this.jwtHelpersService.updateRefreshToken(
-      user.id,
-      tokens.refreshToken,
+    const session = await this.sessionsService.createSession({
+      userId: user.id,
+    });
+    const tokens = await this.jwtHelpersService.getTokens(
+      user,
+      session.sessionId,
     );
-    return { tokens, secret };
+    return tokens;
   }
 
-  async logout(id: string): Promise<User> {
-    return this.usersService.updateUser(id, { refreshToken: null });
+  async logout(sessionId: string): Promise<void> {
+    return this.sessionsService.revokeSession(sessionId);
   }
 }

@@ -6,11 +6,10 @@ import User from 'src/users/entities/user.entity';
 import GetUser from 'src/users/get-user.decorator';
 import { AuthService } from './auth.service';
 import AuthCredentialsDto from './dto/auth-credentials.dto';
-import JwtHelpersService from './helpers/jwt-helpers.service';
+import JwtHelpersService from './utils/jwt-helpers.service';
 
 type ControllerReturnType = Promise<{
   accessToken: string;
-  refreshToken: string;
 }>;
 
 @Controller('auth')
@@ -25,11 +24,13 @@ export default class AuthController {
     @Body() createUserDto: CreateUserDto,
     @Res({ passthrough: true }) response: Response,
   ): ControllerReturnType {
-    const { tokens, secret } = await this.authService.signUp(createUserDto);
-    response.cookie('secret', secret, {
+    const { accessToken, refreshToken } = await this.authService.signUp(
+      createUserDto,
+    );
+    response.cookie('refresh-token', refreshToken, {
       httpOnly: true,
     });
-    return tokens;
+    return { accessToken };
   }
 
   @Post('/login')
@@ -37,35 +38,36 @@ export default class AuthController {
     @Body() authCredentialsDto: AuthCredentialsDto,
     @Res({ passthrough: true }) response: Response,
   ): ControllerReturnType {
-    const { tokens, secret } = await this.authService.login(authCredentialsDto);
-    response.cookie('secret', secret, {
+    const { accessToken, refreshToken } = await this.authService.login(
+      authCredentialsDto,
+    );
+    response.cookie('refresh-token', refreshToken, {
       httpOnly: true,
     });
-    return tokens;
+    return { accessToken };
   }
 
   @Get('/logout')
-  @UseGuards(AuthGuard('jwt'))
-  logout(@GetUser() user: User): { message: string } {
-    this.authService.logout(user.id);
+  @UseGuards(AuthGuard('jwt-refresh'))
+  logout(@GetUser() reqUser: { user: User; sessionId: string }): {
+    message: string;
+  } {
+    this.authService.logout(reqUser.sessionId);
     return { message: 'Logged out' };
   }
 
   @Get('/refresh')
   @UseGuards(AuthGuard('jwt-refresh'))
   async refreshTokens(
-    @GetUser() user: { user: User; refreshToken: string },
+    @GetUser() reqUser: { user: User; sessionId: string },
     @Res({ passthrough: true }) response: Response,
   ): ControllerReturnType {
-    const { id } = user.user;
-    const { refreshToken } = user;
-    const { tokens, secret } = await this.jwtHelpersService.refreshTokens(
-      id,
-      refreshToken,
-    );
-    response.cookie('secret', secret, {
+    const { user, sessionId } = reqUser;
+    const { accessToken, refreshToken } =
+      await this.jwtHelpersService.refreshTokens(user, sessionId);
+    response.cookie('refresh-token', refreshToken, {
       httpOnly: true,
     });
-    return tokens;
+    return { accessToken };
   }
 }

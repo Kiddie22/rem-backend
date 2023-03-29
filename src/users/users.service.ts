@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import AuthHelpersService from 'src/auth/helpers/auth-helpers.service';
+import AuthHelpersService from 'src/auth/utils/auth-helpers.service';
 import { Repository } from 'typeorm';
 import CreateUserDto from './dto/create-user.dto';
 import UpdateUserDto from './dto/update-user.dto';
@@ -35,7 +35,8 @@ export default class UsersService {
 
   async getUserById(id: string): Promise<User> {
     const user = await this.usersRepository.findOneBy({ id });
-    return user;
+    if (user) return user;
+    throw new NotFoundException();
   }
 
   async getUserByUsername(username: string): Promise<User> {

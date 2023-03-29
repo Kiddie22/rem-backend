@@ -4,18 +4,20 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm/dist';
 import UsersModule from 'src/users/users.module';
 import User from 'src/users/entities/user.entity';
+import SessionsModule from 'src/sessions/sessions.module';
 import { AuthService } from './auth.service';
 import AuthController from './auth.controller';
 import AccessTokenStrategy from './strategies/accessToken.strategy';
 import RefreshTokenStrategy from './strategies/refreshToken.strategy';
-import JwtHelpersService from './helpers/jwt-helpers.service';
+import JwtHelpersService from './utils/jwt-helpers.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
-    PassportModule,
     JwtModule.register({}),
+    PassportModule,
     UsersModule,
+    SessionsModule,
   ],
   providers: [
     AuthService,
