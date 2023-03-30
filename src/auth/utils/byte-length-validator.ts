@@ -4,11 +4,13 @@ import {
   ValidationArguments,
 } from 'class-validator';
 
-@ValidatorConstraint({ name: 'customText', async: false })
-export default class MaxPasswordLength implements ValidatorConstraintInterface {
+@ValidatorConstraint({ name: 'byteLength', async: false })
+export default class ByteLengthValidator
+  implements ValidatorConstraintInterface
+{
   validate(text: string, _args: ValidationArguments): boolean {
-    const byteSize = (str: string): number => new Blob([str]).size;
-    return byteSize(text) > 1 && byteSize(text) < 72;
+    const byteSize = Buffer.byteLength(text, 'utf8');
+    return byteSize > 1 && byteSize <= 72;
   }
 
   defaultMessage(_args: ValidationArguments): string {
