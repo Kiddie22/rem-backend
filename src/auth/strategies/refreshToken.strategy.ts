@@ -3,7 +3,6 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import UsersService from 'src/users/users.service';
-import jwtConstants from 'src/constants';
 import SessionsService from 'src/sessions/sessions.service';
 import User from 'src/users/entities/user.entity';
 import { JwtPayload } from '../jwt-payload.interface';
@@ -18,7 +17,7 @@ export default class RefreshTokenStrategy extends PassportStrategy(
     private sessionsService: SessionsService,
   ) {
     super({
-      secretOrKey: jwtConstants.refresh_secret,
+      secretOrKey: process.env.REFRESH_SECRET,
       passReqToCallback: true,
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request): string => {

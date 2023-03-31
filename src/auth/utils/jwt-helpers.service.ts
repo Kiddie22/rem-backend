@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from 'src/auth/jwt-payload.interface';
-import jwtConstants from 'src/constants';
 import SessionsService from 'src/sessions/sessions.service';
 import User from 'src/users/entities/user.entity';
 
@@ -16,7 +15,7 @@ export default class JwtHelpersService {
     const { id, username } = user;
     const payload: JwtPayload = { id, username };
     const accessToken = await this.jwtService.signAsync(payload, {
-      secret: jwtConstants.access_secret,
+      secret: process.env.ACCESS_SECRET,
       expiresIn: '5m',
     });
     return accessToken;
@@ -26,7 +25,7 @@ export default class JwtHelpersService {
     const { id, username } = user;
     const payload: JwtPayload = { id, username, sessionId };
     const refreshToken = await this.jwtService.signAsync(payload, {
-      secret: jwtConstants.refresh_secret,
+      secret: process.env.REFRESH_SECRET,
       expiresIn: '15m',
     });
     return refreshToken;
