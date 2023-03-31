@@ -1,4 +1,5 @@
-import { IsString, MaxLength, MinLength } from 'class-validator';
+import { IsString, MaxLength, MinLength, Validate } from 'class-validator';
+import ByteLengthValidator from '../utils/byte-length-validator';
 
 export default class AuthCredentialsDto {
   @IsString()
@@ -14,8 +15,6 @@ export default class AuthCredentialsDto {
   @MinLength(8, {
     message: 'Password too short.',
   })
-  @MaxLength(32, {
-    message: 'Password too long.',
-  })
+  @Validate(ByteLengthValidator)
   password: string;
 }
