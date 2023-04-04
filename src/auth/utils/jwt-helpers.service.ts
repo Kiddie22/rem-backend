@@ -16,7 +16,7 @@ export default class JwtHelpersService {
     const payload: JwtPayload = { id, username };
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: process.env.ACCESS_SECRET,
-      expiresIn: '5m',
+      expiresIn: `${process.env.ACCESS_EXP_TIME}m`,
     });
     return accessToken;
   }
@@ -26,7 +26,7 @@ export default class JwtHelpersService {
     const payload: JwtPayload = { id, username, sessionId };
     const refreshToken = await this.jwtService.signAsync(payload, {
       secret: process.env.REFRESH_SECRET,
-      expiresIn: '15m',
+      expiresIn: `${process.env.REFRESH_EXP_TIME}m`,
     });
     return refreshToken;
   }

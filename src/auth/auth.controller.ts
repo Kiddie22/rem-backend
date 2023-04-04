@@ -10,6 +10,7 @@ import AuthHelpersService from './utils/auth-helpers.service';
 import JwtHelpersService from './utils/jwt-helpers.service';
 
 type ControllerReturnType = Promise<{
+  user: User;
   accessToken: string;
 }>;
 
@@ -25,14 +26,15 @@ export default class AuthController {
     @Body() createUserDto: CreateUserDto,
     @Res({ passthrough: true }) response: Response,
   ): ControllerReturnType {
-    const { accessToken, refreshToken } = await this.authService.signUp(
-      createUserDto,
-    );
+    const { user, tokens } = await this.authService.signUp(createUserDto);
+    const { accessToken, refreshToken } = tokens;
     response.cookie('refresh-token', refreshToken, {
       httpOnly: true,
-      expires: AuthHelpersService.returnTokenExpiryDate(),
+      expires: AuthHelpersService.returnTokenExpiryDate(
+        process.env.REFRESH_EXP_TIME,
+      ),
     });
-    return { accessToken };
+    return { user, accessToken };
   }
 
   @Post('/login')
@@ -40,14 +42,15 @@ export default class AuthController {
     @Body() authCredentialsDto: AuthCredentialsDto,
     @Res({ passthrough: true }) response: Response,
   ): ControllerReturnType {
-    const { accessToken, refreshToken } = await this.authService.login(
-      authCredentialsDto,
-    );
+    const { user, tokens } = await this.authService.login(authCredentialsDto);
+    const { accessToken, refreshToken } = tokens;
     response.cookie('refresh-token', refreshToken, {
       httpOnly: true,
-      expires: AuthHelpersService.returnTokenExpiryDate(),
+      expires: AuthHelpersService.returnTokenExpiryDate(
+        process.env.REFRESH_EXP_TIME,
+      ),
     });
-    return { accessToken };
+    return { user, accessToken };
   }
 
   @Get('/logout')
@@ -70,8 +73,10 @@ export default class AuthController {
       await this.jwtHelpersService.refreshTokens(user, sessionId);
     response.cookie('refresh-token', refreshToken, {
       httpOnly: true,
-      expires: AuthHelpersService.returnTokenExpiryDate(),
+      expires: AuthHelpersService.returnTokenExpiryDate(
+        process.env.REFRESH_EXP_TIME,
+      ),
     });
-    return { accessToken };
+    return { user, accessToken };
   }
 }
