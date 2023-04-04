@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConflictException } from '@nestjs/common/exceptions/conflict.exception';
 import { InternalServerErrorException } from '@nestjs/common/exceptions/internal-server-error.exception';
+import DateHelpersService from './date-helpers.service';
 
 @Injectable()
 export default class AuthHelpersService {
@@ -22,9 +23,7 @@ export default class AuthHelpersService {
     }
   }
 
-  static returnTokenExpiryDate(): Date {
-    const date = new Date();
-    date.setTime(date.getTime() + 15 * 60 * 1000);
-    return date;
+  static returnTokenExpiryDate(minutes: string): Date {
+    return DateHelpersService.returnTimePlusMinutes(+minutes);
   }
 }
