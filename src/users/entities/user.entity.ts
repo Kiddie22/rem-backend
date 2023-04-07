@@ -1,6 +1,7 @@
 import { Exclude } from 'class-transformer';
 import Role from 'src/auth/roles/enums/role.enum';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Property } from 'src/properties/property.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export default class User {
@@ -19,4 +20,7 @@ export default class User {
 
   @Column()
   role: Role;
+
+  @OneToMany((_type) => Property, (property) => property.user, { eager: false })
+  properties: Property[];
 }

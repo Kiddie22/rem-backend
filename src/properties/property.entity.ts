@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import User from 'src/users/entities/user.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Property {
@@ -16,6 +17,9 @@ export class Property {
 
   @Column()
   noOfBathrooms: number;
+
+  @ManyToOne((_type) => User, (user) => user.properties, { eager: true })
+  user: User;
 }
 
 export enum PropertyType {
