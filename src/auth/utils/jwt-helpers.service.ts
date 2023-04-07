@@ -12,8 +12,8 @@ export default class JwtHelpersService {
   ) {}
 
   async createAccessToken(user: User): Promise<string> {
-    const { id, username } = user;
-    const payload: JwtPayload = { id, username };
+    const { id, username, role } = user;
+    const payload: JwtPayload = { id, username, role };
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: process.env.ACCESS_SECRET,
       expiresIn: `${process.env.ACCESS_EXP_TIME}m`,
@@ -22,8 +22,8 @@ export default class JwtHelpersService {
   }
 
   async createRefreshToken(user: User, sessionId: string): Promise<string> {
-    const { id, username } = user;
-    const payload: JwtPayload = { id, username, sessionId };
+    const { id, username, role } = user;
+    const payload: JwtPayload = { id, username, role, sessionId };
     const refreshToken = await this.jwtService.signAsync(payload, {
       secret: process.env.REFRESH_SECRET,
       expiresIn: `${process.env.REFRESH_EXP_TIME}m`,
