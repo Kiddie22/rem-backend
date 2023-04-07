@@ -55,9 +55,13 @@ export default class AuthController {
 
   @Get('/logout')
   @UseGuards(AuthGuard('jwt-refresh'))
-  logout(@GetUser() reqUser: { user: User; sessionId: string }): {
+  logout(
+    @GetUser() reqUser: { user: User; sessionId: string },
+    @Res({ passthrough: true }) response: Response,
+  ): {
     message: string;
   } {
+    response.clearCookie('refresh-token');
     this.authService.logout(reqUser.sessionId);
     return { message: 'Logged out' };
   }
