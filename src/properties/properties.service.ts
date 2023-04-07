@@ -25,6 +25,11 @@ export default class PropertiesService {
     await this.propertiesRepository.save(property);
   }
 
+  async getUsersProperties(userId: string): Promise<Property[]> {
+    const user = await this.usersService.getUserById(userId);
+    return this.propertiesRepository.findBy({ user });
+  }
+
   async getPropertyById(propertyId: string): Promise<Property> {
     try {
       const property = await this.propertiesRepository.findOneBy({
