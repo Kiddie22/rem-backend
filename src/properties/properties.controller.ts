@@ -9,7 +9,7 @@ import {
   Controller,
 } from '@nestjs/common';
 import { Roles } from 'src/auth/roles/roles.decorator';
-import Role from 'src/auth/roles/enums/role.enum';
+import Role from 'src/auth/roles/role-type';
 import RolesGuard from 'src/auth/roles/guards/roles.guard';
 import GetUser from 'src/users/get-user.decorator';
 import IsOwnerGuard from 'src/auth/roles/guards/owner.guards';
@@ -23,7 +23,7 @@ export default class PropertiesController {
   constructor(private propertiesService: PropertiesService) {}
 
   @Post()
-  @Roles(Role.Owner)
+  @Roles('owner')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   createProperty(
     @Body() createPropertyDto: CreatePropertyDto,
@@ -35,14 +35,14 @@ export default class PropertiesController {
   }
 
   @Get()
-  @Roles(Role.Owner)
+  @Roles('owner')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   async getUsersProperties(@GetUser() user: JwtPayload): Promise<Property[]> {
     return this.propertiesService.getUsersProperties(user.id);
   }
 
   @Get(':id')
-  @Roles(Role.Owner)
+  @Roles('owner')
   @UseGuards(AuthGuard('jwt'), RolesGuard, IsOwnerGuard)
   async getPropertyById(@Param() params): Promise<Property> {
     const { id } = params;
@@ -50,7 +50,7 @@ export default class PropertiesController {
   }
 
   @Delete(':id')
-  @Roles(Role.Owner)
+  @Roles('owner')
   @UseGuards(AuthGuard('jwt'), RolesGuard, IsOwnerGuard)
   async deletePropertyById(@Param() params): Promise<string> {
     const { id } = params;

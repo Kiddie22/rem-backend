@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JwtPayload } from '../jwt-payload.interface';
-import Role from '../roles/enums/role.enum';
+import Role from '../roles/role-type';
 
 @Injectable()
 export default class AccessTokenStrategy extends PassportStrategy(

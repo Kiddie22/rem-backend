@@ -4,8 +4,10 @@ import {
   IsString,
   MaxLength,
   MinLength,
+  Validate,
 } from 'class-validator';
-import Role from 'src/auth/roles/enums/role.enum';
+import Role, { RolesArray } from 'src/auth/roles/role-type';
+import ByteLengthValidator from 'src/auth/utils/byte-length-validator';
 
 export default class CreateUserDto {
   @IsString()
@@ -22,8 +24,9 @@ export default class CreateUserDto {
 
   @IsString()
   @MinLength(8)
+  @Validate(ByteLengthValidator)
   password: string;
 
-  @IsEnum(Role)
+  @IsEnum(RolesArray)
   role: Role;
 }
