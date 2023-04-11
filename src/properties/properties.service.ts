@@ -2,8 +2,9 @@ import { Repository } from 'typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import UsersService from 'src/users/users.service';
-import { Property } from './property.entity';
 import CreatePropertyDto from './dto/create-property.dto';
+import UpdatePropertyDto from './dto/update-property.dto';
+import Property from './property.entity';
 
 @Injectable()
 export default class PropertiesService {
@@ -40,6 +41,16 @@ export default class PropertiesService {
     } catch (error) {
       throw new NotFoundException();
     }
+  }
+
+  async updatePropertyById(
+    propertyId: string,
+    updatePropertyDto: UpdatePropertyDto,
+  ): Promise<Property> {
+    const property = await this.getPropertyById(propertyId);
+    Object.assign(property, updatePropertyDto);
+    await this.propertiesRepository.save(property);
+    return property;
   }
 
   async deleteProperty(propertyId: string): Promise<void> {

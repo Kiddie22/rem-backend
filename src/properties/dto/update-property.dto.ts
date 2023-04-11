@@ -5,7 +5,7 @@ import {
   IsString,
   MaxLength,
 } from 'class-validator';
-import { PropertyType } from '../property.entity';
+import { PropertyType, PropertyTypesArray } from '../property-type';
 
 export default class UpdatePropertyDto {
   @IsString()
@@ -13,7 +13,7 @@ export default class UpdatePropertyDto {
   @IsOptional()
   propertyName: string;
 
-  @IsEnum(PropertyType)
+  @IsEnum(PropertyTypesArray)
   @IsOptional()
   propertyType: PropertyType;
 

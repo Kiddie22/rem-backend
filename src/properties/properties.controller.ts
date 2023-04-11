@@ -7,6 +7,7 @@ import {
   Param,
   UseGuards,
   Controller,
+  Patch,
 } from '@nestjs/common';
 import { Roles } from 'src/auth/roles/roles.decorator';
 import Role from 'src/auth/roles/role-type';
@@ -16,7 +17,8 @@ import IsOwnerGuard from 'src/auth/roles/guards/owner.guards';
 import { JwtPayload } from 'src/auth/jwt-payload.interface';
 import PropertiesService from './properties.service';
 import CreatePropertyDto from './dto/create-property.dto';
-import { Property } from './property.entity';
+import UpdatePropertyDto from './dto/update-property.dto';
+import Property from './property.entity';
 
 @Controller('properties')
 export default class PropertiesController {
@@ -44,16 +46,24 @@ export default class PropertiesController {
   @Get(':id')
   @Roles('owner')
   @UseGuards(AuthGuard('jwt'), RolesGuard, IsOwnerGuard)
-  async getPropertyById(@Param() params): Promise<Property> {
-    const { id } = params;
+  async getPropertyById(@Param('id') id: string): Promise<Property> {
     return this.propertiesService.getPropertyById(id);
+  }
+
+  @Patch(':id')
+  @Roles('owner')
+  @UseGuards(AuthGuard('jwt'), RolesGuard, IsOwnerGuard)
+  async updatePropertyById(
+    @Param('id') id: string,
+    @Body() updatePropertyDto: UpdatePropertyDto,
+  ): Promise<Property> {
+    return this.propertiesService.updatePropertyById(id, updatePropertyDto);
   }
 
   @Delete(':id')
   @Roles('owner')
   @UseGuards(AuthGuard('jwt'), RolesGuard, IsOwnerGuard)
-  async deletePropertyById(@Param() params): Promise<string> {
-    const { id } = params;
+  async deletePropertyById(@Param('id') id: string): Promise<string> {
     await this.propertiesService.deleteProperty(id);
     return 'Property Deleted';
   }

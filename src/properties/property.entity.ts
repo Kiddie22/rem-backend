@@ -1,8 +1,9 @@
 import User from 'src/users/entities/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { PropertyType } from './property-type';
 
 @Entity()
-export class Property {
+export default class Property {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -20,10 +21,4 @@ export class Property {
 
   @ManyToOne((_type) => User, (user) => user.properties, { eager: true })
   user: User;
-}
-
-export enum PropertyType {
-  House = 'HOUSE',
-  Apartment = 'APARTMENT',
-  Mobile = 'MOBILE_HOME',
 }

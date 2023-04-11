@@ -1,12 +1,12 @@
 import { IsEnum, IsInt, IsString, MaxLength } from 'class-validator';
-import { PropertyType } from '../property.entity';
+import { PropertyType, PropertyTypesArray } from '../property-type';
 
 export default class CreatePropertyDto {
   @IsString()
   @MaxLength(30)
   propertyName: string;
 
-  @IsEnum(PropertyType)
+  @IsEnum(PropertyTypesArray)
   propertyType: PropertyType;
 
   @IsInt()
