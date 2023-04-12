@@ -17,13 +17,14 @@ export default class PropertiesService {
   async createProperty(
     createPropertyDto: CreatePropertyDto,
     userId: string,
-  ): Promise<void> {
+  ): Promise<Property> {
     const user = await this.usersService.getUserById(userId);
     const property = this.propertiesRepository.create({
       ...createPropertyDto,
       user,
     });
     await this.propertiesRepository.save(property);
+    return property;
   }
 
   async getUsersProperties(userId: string): Promise<Property[]> {

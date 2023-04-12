@@ -30,10 +30,9 @@ export default class PropertiesController {
   createProperty(
     @Body() createPropertyDto: CreatePropertyDto,
     @GetUser() user: { id: string; username: string; role: Role },
-  ): string {
+  ): Promise<Property> {
     const userId = user.id;
-    this.propertiesService.createProperty(createPropertyDto, userId);
-    return 'Property Created';
+    return this.propertiesService.createProperty(createPropertyDto, userId);
   }
 
   @Get()
