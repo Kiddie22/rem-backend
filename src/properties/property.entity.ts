@@ -14,6 +14,12 @@ export default class Property {
   propertyType: PropertyType;
 
   @Column()
+  location: string;
+
+  @Column()
+  squareFeet: number;
+
+  @Column()
   noOfBedrooms: number;
 
   @Column()
