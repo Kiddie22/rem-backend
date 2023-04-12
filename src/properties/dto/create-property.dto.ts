@@ -3,10 +3,12 @@ import { PropertyType, PropertyTypesArray } from '../property-type';
 
 export default class CreatePropertyDto {
   @IsString()
-  @MaxLength(30)
+  @MaxLength(255)
   propertyName: string;
 
-  @IsEnum(PropertyTypesArray)
+  @IsEnum(PropertyTypesArray, {
+    message: 'Property Type should be House, Apartment or Mobile',
+  })
   propertyType: PropertyType;
 
   @IsInt()
