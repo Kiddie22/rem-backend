@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JwtPayload } from '../jwt-payload.interface';
-import Role from '../roles/role-type';
 
 @Injectable()
 export default class AccessTokenStrategy extends PassportStrategy(
@@ -19,9 +18,9 @@ export default class AccessTokenStrategy extends PassportStrategy(
   // eslint-disable-next-line class-methods-use-this
   async validate(
     payload: JwtPayload,
-  ): Promise<{ id: string; username: string; role: Role }> {
-    const { id, username, role } = payload;
-    const user = { id, username, role };
+  ): Promise<{ id: string; username: string }> {
+    const { id, username } = payload;
+    const user = { id, username };
     return user;
   }
 }

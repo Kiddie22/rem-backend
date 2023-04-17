@@ -1,5 +1,4 @@
 import { Exclude } from 'class-transformer';
-import Role from 'src/auth/roles/role-type';
 import Property from 'src/properties/property.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -17,9 +16,6 @@ export default class User {
   @Column()
   @Exclude({ toPlainOnly: true })
   password: string;
-
-  @Column()
-  role: Role;
 
   @OneToMany((_type) => Property, (property) => property.user, { eager: false })
   properties: Property[];
