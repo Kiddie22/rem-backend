@@ -49,9 +49,9 @@ export default class PropertiesService {
     updatePropertyDto: UpdatePropertyDto,
   ): Promise<Property> {
     const property = await this.getPropertyById(propertyId);
-    Object.assign(property, updatePropertyDto);
-    await this.propertiesRepository.save(property);
-    return property;
+    const updatedProperty = { ...property, ...updatePropertyDto };
+    await this.propertiesRepository.save(updatedProperty);
+    return updatedProperty;
   }
 
   async deleteProperty(propertyId: string): Promise<void> {

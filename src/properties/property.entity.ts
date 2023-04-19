@@ -16,13 +16,13 @@ export default class Property {
   @Column()
   location: string;
 
-  @Column()
+  @Column({ type: 'real' })
   squareFeet: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   noOfBedrooms: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   noOfBathrooms: number;
 
   @ManyToOne((_type) => User, (user) => user.properties, { eager: true })
