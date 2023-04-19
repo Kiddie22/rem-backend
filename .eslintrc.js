@@ -24,6 +24,8 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'error',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'error',
+    'no-restricted-syntax': 'off',
+    'no-await-in-loop': 'off',
     'prettier/prettier': [
       'error',
       {

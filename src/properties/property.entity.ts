@@ -1,7 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import User from 'src/users/entities/user.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { PropertyType } from './property-type';
 
 @Entity()
-export class Property {
+export default class Property {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -12,14 +14,17 @@ export class Property {
   propertyType: PropertyType;
 
   @Column()
+  location: string;
+
+  @Column({ type: 'real' })
+  squareFeet: number;
+
+  @Column({ type: 'smallint' })
   noOfBedrooms: number;
 
-  @Column()
+  @Column({ type: 'smallint' })
   noOfBathrooms: number;
-}
 
-export enum PropertyType {
-  House = 'HOUSE',
-  Apartment = 'APARTMENT',
-  Mobile = 'MOBILE_HOME',
+  @ManyToOne((_type) => User, (user) => user.properties, { eager: true })
+  user: User;
 }
