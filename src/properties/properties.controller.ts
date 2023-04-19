@@ -10,8 +10,9 @@ import {
   Patch,
 } from '@nestjs/common';
 import GetUser from 'src/users/get-user.decorator';
-import IsOwnerGuard from 'src/auth/owner.guards';
 import { JwtPayload } from 'src/auth/jwt-payload.interface';
+import CheckAbilities from 'src/ability/abilities.decorator';
+import AbilitiesGuard from 'src/ability/abilities.guard';
 import PropertiesService from './properties.service';
 import CreatePropertyDto from './dto/create-property.dto';
 import UpdatePropertyDto from './dto/update-property.dto';
@@ -38,13 +39,15 @@ export default class PropertiesController {
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'), IsOwnerGuard)
+  @CheckAbilities({ action: 'Read', subject: Property })
+  @UseGuards(AuthGuard('jwt'), AbilitiesGuard)
   async getPropertyById(@Param('id') id: string): Promise<Property> {
     return this.propertiesService.getPropertyById(id);
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard('jwt'), IsOwnerGuard)
+  @CheckAbilities({ action: 'Update', subject: Property })
+  @UseGuards(AuthGuard('jwt'), AbilitiesGuard)
   async updatePropertyById(
     @Param('id') id: string,
     @Body() updatePropertyDto: UpdatePropertyDto,
@@ -53,7 +56,8 @@ export default class PropertiesController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'), IsOwnerGuard)
+  @CheckAbilities({ action: 'Delete', subject: Property })
+  @UseGuards(AuthGuard('jwt'), AbilitiesGuard)
   async deletePropertyById(@Param('id') id: string): Promise<string> {
     await this.propertiesService.deleteProperty(id);
     return 'Property Deleted';
