@@ -22,6 +22,7 @@ export default class PropertiesService {
     const property = this.propertiesRepository.create({
       ...createPropertyDto,
       user,
+      isListed: false,
     });
     await this.propertiesRepository.save(property);
     return property;
@@ -30,6 +31,13 @@ export default class PropertiesService {
   async getUsersProperties(userId: string): Promise<Property[]> {
     const user = await this.usersService.getUserById(userId);
     return this.propertiesRepository.findBy({ user });
+  }
+
+  async getListedProperties(): Promise<Property[]> {
+    const properties = await this.propertiesRepository.findBy({
+      isListed: true,
+    });
+    return properties;
   }
 
   async getPropertyById(propertyId: string): Promise<Property> {
@@ -57,5 +65,17 @@ export default class PropertiesService {
   async deleteProperty(propertyId: string): Promise<void> {
     const property = await this.getPropertyById(propertyId);
     this.propertiesRepository.remove(property);
+  }
+
+  async listProperty(propertyId: string): Promise<void> {
+    const property = await this.getPropertyById(propertyId);
+    property.isListed = true;
+    await this.propertiesRepository.save(property);
+  }
+
+  async delistProperty(propertyId: string): Promise<void> {
+    const property = await this.getPropertyById(propertyId);
+    property.isListed = false;
+    await this.propertiesRepository.save(property);
   }
 }

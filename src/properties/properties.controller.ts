@@ -38,6 +38,12 @@ export default class PropertiesController {
     return this.propertiesService.getUsersProperties(user.id);
   }
 
+  @Get('listed')
+  @UseGuards(AuthGuard('jwt'))
+  async getListedProperties(): Promise<Property[]> {
+    return this.propertiesService.getListedProperties();
+  }
+
   @Get(':id')
   @CheckAbilities({ action: 'Read', subject: Property })
   @UseGuards(AuthGuard('jwt'), AbilitiesGuard)
@@ -53,6 +59,22 @@ export default class PropertiesController {
     @Body() updatePropertyDto: UpdatePropertyDto,
   ): Promise<Property> {
     return this.propertiesService.updatePropertyById(id, updatePropertyDto);
+  }
+
+  @Patch('list/:id')
+  @CheckAbilities({ action: 'Update', subject: Property })
+  @UseGuards(AuthGuard('jwt'), AbilitiesGuard)
+  async listProperty(@Param('id') id: string): Promise<string> {
+    await this.propertiesService.listProperty(id);
+    return 'Property listed';
+  }
+
+  @Patch('delist/:id')
+  @CheckAbilities({ action: 'Update', subject: Property })
+  @UseGuards(AuthGuard('jwt'), AbilitiesGuard)
+  async delistProperty(@Param('id') id: string): Promise<string> {
+    await this.propertiesService.delistProperty(id);
+    return 'Property delisted';
   }
 
   @Delete(':id')
