@@ -1,14 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import AuthModule from './auth/auth.module';
-import PropertiesModule from './properties/properties.module';
-import UsersModule from './users/users.module';
 import AbilityModule from './ability/ability.module';
 import ListModule from './properties/list/list.module';
 
 @Module({
   imports: [
-    AuthModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -20,9 +16,7 @@ import ListModule from './properties/list/list.module';
       synchronize: true,
     }),
     AbilityModule,
-    PropertiesModule,
     ListModule,
-    UsersModule,
   ],
 })
 export default class AppModule {}
