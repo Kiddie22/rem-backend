@@ -4,6 +4,7 @@ import AuthModule from './auth/auth.module';
 import PropertiesModule from './properties/properties.module';
 import UsersModule from './users/users.module';
 import AbilityModule from './ability/ability.module';
+import ListModule from './properties/list/list.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import AbilityModule from './ability/ability.module';
     }),
     AbilityModule,
     PropertiesModule,
+    ListModule,
     UsersModule,
   ],
 })
