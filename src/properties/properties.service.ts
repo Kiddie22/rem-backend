@@ -66,10 +66,4 @@ export default class PropertiesService {
     const property = await this.getPropertyById(propertyId);
     this.propertiesRepository.remove(property);
   }
-
-  async delistProperty(propertyId: string): Promise<void> {
-    const property = await this.getPropertyById(propertyId);
-    property.isListed = false;
-    await this.propertiesRepository.save(property);
-  }
 }

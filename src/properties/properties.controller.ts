@@ -61,14 +61,6 @@ export default class PropertiesController {
     return this.propertiesService.updatePropertyById(id, updatePropertyDto);
   }
 
-  @Patch('delist/:id')
-  @CheckAbilities({ action: 'Update', subject: Property })
-  @UseGuards(AuthGuard('jwt'), AbilitiesGuard)
-  async delistProperty(@Param('id') id: string): Promise<string> {
-    await this.propertiesService.delistProperty(id);
-    return 'Property delisted';
-  }
-
   @Delete(':id')
   @CheckAbilities({ action: 'Delete', subject: Property })
   @UseGuards(AuthGuard('jwt'), AbilitiesGuard)
