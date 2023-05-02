@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import AbilityModule from './ability/ability.module';
 import ListModule from './properties/list/list.module';
 import DelistModule from './properties/delist/delist.module';
+import TenantModule from './properties/tenant/tenant.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import DelistModule from './properties/delist/delist.module';
     AbilityModule,
     ListModule,
     DelistModule,
+    TenantModule,
   ],
 })
 export default class AppModule {}

@@ -23,7 +23,8 @@ export default class PropertiesService {
     const user = await this.usersService.getUserById(userId);
     const property = this.propertiesRepository.create({
       ...createPropertyDto,
-      user,
+      owner: user,
+      tenant: null,
       isListed: false,
     });
     await this.propertiesRepository.save(property);
