@@ -8,15 +8,16 @@ import {
   UseGuards,
   Controller,
   Patch,
+  Query,
 } from '@nestjs/common';
 import GetUser from 'src/users/get-user.decorator';
-import { JwtPayload } from 'src/auth/jwt-payload.interface';
 import CheckAbilities from 'src/ability/abilities.decorator';
 import AbilitiesGuard from 'src/ability/abilities.guard';
 import PropertiesService from './properties.service';
 import CreatePropertyDto from './dto/create-property.dto';
 import UpdatePropertyDto from './dto/update-property.dto';
 import Property from './property.entity';
+import FilterPropertiesDto from './dto/filter-properties.dto';
 
 @Controller('properties')
 export default class PropertiesController {
@@ -34,14 +35,10 @@ export default class PropertiesController {
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
-  async getUsersProperties(@GetUser() user: JwtPayload): Promise<Property[]> {
-    return this.propertiesService.getUsersProperties(user.id);
-  }
-
-  @Get('listed')
-  @UseGuards(AuthGuard('jwt'))
-  async getListedProperties(): Promise<Property[]> {
-    return this.propertiesService.getListedProperties();
+  async getProperties(
+    @Query() filterPropertiesDto: FilterPropertiesDto,
+  ): Promise<Property[]> {
+    return this.propertiesService.getProperties(filterPropertiesDto);
   }
 
   @Get(':id')

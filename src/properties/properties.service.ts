@@ -5,6 +5,8 @@ import UsersService from 'src/users/users.service';
 import CreatePropertyDto from './dto/create-property.dto';
 import UpdatePropertyDto from './dto/update-property.dto';
 import Property from './property.entity';
+import FilterPropertiesDto from './dto/filter-properties.dto';
+import createPropertyQB from './utils/property-query-builder';
 
 @Injectable()
 export default class PropertiesService {
@@ -28,15 +30,11 @@ export default class PropertiesService {
     return property;
   }
 
-  async getUsersProperties(userId: string): Promise<Property[]> {
-    const user = await this.usersService.getUserById(userId);
-    return this.propertiesRepository.findBy({ user });
-  }
-
-  async getListedProperties(): Promise<Property[]> {
-    const properties = await this.propertiesRepository.findBy({
-      isListed: true,
-    });
+  async getProperties(
+    filterPropertiesDto: FilterPropertiesDto,
+  ): Promise<Property[]> {
+    const qb = createPropertyQB(this.propertiesRepository, filterPropertiesDto);
+    const properties = await qb.getMany();
     return properties;
   }
 
