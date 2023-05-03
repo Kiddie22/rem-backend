@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, MethodNotAllowedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Property from '../property.entity';
@@ -14,6 +14,11 @@ export default class ListService {
 
   async listProperty(propertyId: string): Promise<void> {
     const property = await this.propertiesService.getPropertyById(propertyId);
+    if (property.tenant) {
+      throw new MethodNotAllowedException(
+        'Cannot list property while it is occupied',
+      );
+    }
     property.isListed = true;
     await this.propertiesRepository.save(property);
   }
