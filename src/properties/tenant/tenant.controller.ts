@@ -1,4 +1,11 @@
-import { Controller, Patch, Param, UseGuards, Body } from '@nestjs/common';
+import {
+  Controller,
+  Param,
+  UseGuards,
+  Body,
+  Post,
+  Delete,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import AbilitiesGuard from 'src/ability/abilities.guard';
 import CheckAbilities from 'src/ability/abilities.decorator';
@@ -10,7 +17,7 @@ import UpdateTenantDto from './dto/update-tenant.dto';
 export default class TenantController {
   constructor(private readonly tenantService: TenantService) {}
 
-  @Patch('/add')
+  @Post('/')
   @CheckAbilities({ action: 'Update', subject: Property })
   @UseGuards(AuthGuard('jwt'), AbilitiesGuard)
   async addTenant(
@@ -24,7 +31,7 @@ export default class TenantController {
     return property;
   }
 
-  @Patch('/remove')
+  @Delete('/')
   @CheckAbilities({ action: 'Update', subject: Property })
   @UseGuards(AuthGuard('jwt'), AbilitiesGuard)
   async removeTenant(@Param('id') propertyId: string): Promise<Property> {
