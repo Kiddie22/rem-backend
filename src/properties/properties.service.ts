@@ -38,8 +38,11 @@ export default class PropertiesService {
   async getProperties(
     filterPropertiesDto: FilterPropertiesDto,
   ): Promise<Property[]> {
-    const qb = createPropertyQB(this.propertiesRepository, filterPropertiesDto);
-    const properties = await qb.getMany();
+    const queryBuilder = createPropertyQB(
+      this.propertiesRepository,
+      filterPropertiesDto,
+    );
+    const properties = await queryBuilder.getMany();
     return properties;
   }
 

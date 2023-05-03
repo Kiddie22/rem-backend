@@ -6,16 +6,16 @@ export default function createPropertyQB(
   propertiesRepository: Repository<Property>,
   filterPropertiesDto: FilterPropertiesDto,
 ): SelectQueryBuilder<Property> {
-  const qb = propertiesRepository.createQueryBuilder('property');
+  const queryBuilder = propertiesRepository.createQueryBuilder('property');
   const { ownerId, isListed } = filterPropertiesDto;
 
   if (ownerId) {
-    qb.andWhere('property.owner.id = :ownerId', { ownerId });
+    queryBuilder.andWhere('property.owner.id = :ownerId', { ownerId });
   }
 
   if (isListed) {
-    qb.andWhere('property.isListed = :isListed', { isListed });
+    queryBuilder.andWhere('property.isListed = :isListed', { isListed });
   }
 
-  return qb;
+  return queryBuilder;
 }
