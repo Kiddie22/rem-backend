@@ -1,5 +1,9 @@
 import { Repository } from 'typeorm';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  MethodNotAllowedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import UsersService from 'src/users/users.service';
 import CreatePropertyDto from './dto/create-property.dto';
@@ -64,5 +68,13 @@ export default class PropertiesService {
   async deleteProperty(propertyId: string): Promise<void> {
     const property = await this.getPropertyById(propertyId);
     this.propertiesRepository.remove(property);
+  }
+
+  static checkTenantExists(property: Property): void {
+    if (property.tenant) {
+      throw new MethodNotAllowedException(
+        'A tenant already occupies this property',
+      );
+    }
   }
 }

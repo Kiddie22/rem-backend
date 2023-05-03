@@ -1,4 +1,4 @@
-import { Injectable, MethodNotAllowedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import UsersService from 'src/users/users.service';
@@ -22,11 +22,7 @@ export default class TenantService {
     const { userId } = updateTenantDto;
     const user = await this.usersService.getUserById(userId);
     const property = await this.propertiesService.getPropertyById(propertyId);
-    if (property.tenant) {
-      throw new MethodNotAllowedException(
-        'Cannot add a tenant while a tenant already exists',
-      );
-    }
+    PropertiesService.checkTenantExists(property);
     property.tenant = user;
     await this.propertiesRepository.save(property);
     return property;
