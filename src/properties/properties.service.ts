@@ -1,9 +1,5 @@
 import { Repository } from 'typeorm';
-import {
-  Injectable,
-  MethodNotAllowedException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import UsersService from 'src/users/users.service';
 import CreatePropertyDto from './dto/create-property.dto';
@@ -73,11 +69,10 @@ export default class PropertiesService {
     this.propertiesRepository.remove(property);
   }
 
-  static checkTenantExists(property: Property): void {
+  static checkTenantExists(property: Property): boolean {
     if (property.tenant) {
-      throw new MethodNotAllowedException(
-        'A tenant already occupies this property',
-      );
+      return true;
     }
+    return false;
   }
 }

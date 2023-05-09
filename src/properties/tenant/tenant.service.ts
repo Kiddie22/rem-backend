@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, MethodNotAllowedException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import UsersService from 'src/users/users.service';
@@ -22,7 +22,12 @@ export default class TenantService {
     const { userId } = updateTenantDto;
     const user = await this.usersService.getUserById(userId);
     const property = await this.propertiesService.getPropertyById(propertyId);
-    PropertiesService.checkTenantExists(property);
+    const tenantExists = PropertiesService.checkTenantExists(property);
+    if (tenantExists) {
+      throw new MethodNotAllowedException(
+        'Cannot add a tenant while it is occupied',
+      );
+    }
     property.tenant = user;
     await this.propertiesRepository.save(property);
     return property;
