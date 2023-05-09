@@ -13,7 +13,7 @@ import {
 import GetUser from 'src/users/get-user.decorator';
 import CheckAbilities from 'src/ability/abilities.decorator';
 import AbilitiesGuard from 'src/ability/abilities.guard';
-import JsonResponse from 'src/utils/json-response-format';
+import JsonResponse from 'src/utils/json-response';
 import PropertiesService from './properties.service';
 import CreatePropertyDto from './dto/create-property.dto';
 import UpdatePropertyDto from './dto/update-property.dto';
@@ -64,6 +64,6 @@ export default class PropertiesController {
   @UseGuards(AuthGuard('jwt'), AbilitiesGuard)
   async deletePropertyById(@Param('id') id: string): Promise<JsonResponse> {
     await this.propertiesService.deleteProperty(id);
-    return { status: 200, message: 'Property deleted' };
+    return new JsonResponse(200, 'Property deleted');
   }
 }
