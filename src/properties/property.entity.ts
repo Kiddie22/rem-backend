@@ -1,5 +1,12 @@
 import User from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import Task from 'src/tasks/entities/task.entity';
 import { PropertyType } from './property-type';
 
 @Entity()
@@ -33,4 +40,7 @@ export default class Property {
 
   @ManyToOne((_type) => User, (user) => user.rentedProperties, { eager: true })
   tenant: User;
+
+  @OneToMany((_type) => Task, (task) => task.property, { eager: true })
+  tasks: Task[];
 }
