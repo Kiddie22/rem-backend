@@ -8,15 +8,17 @@ import {
   UseGuards,
   Controller,
   Patch,
+  Query,
 } from '@nestjs/common';
 import GetUser from 'src/users/get-user.decorator';
-import { JwtPayload } from 'src/auth/jwt-payload.interface';
 import CheckAbilities from 'src/ability/abilities.decorator';
 import AbilitiesGuard from 'src/ability/abilities.guard';
+import JsonResponse from 'src/utils/json-response';
 import PropertiesService from './properties.service';
 import CreatePropertyDto from './dto/create-property.dto';
 import UpdatePropertyDto from './dto/update-property.dto';
 import Property from './property.entity';
+import FilterPropertiesDto from './dto/filter-properties.dto';
 
 @Controller('properties')
 export default class PropertiesController {
@@ -34,8 +36,10 @@ export default class PropertiesController {
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
-  async getUsersProperties(@GetUser() user: JwtPayload): Promise<Property[]> {
-    return this.propertiesService.getUsersProperties(user.id);
+  async getProperties(
+    @Query() filterPropertiesDto: FilterPropertiesDto,
+  ): Promise<Property[]> {
+    return this.propertiesService.getProperties(filterPropertiesDto);
   }
 
   @Get(':id')
@@ -58,8 +62,8 @@ export default class PropertiesController {
   @Delete(':id')
   @CheckAbilities({ action: 'Delete', subject: Property })
   @UseGuards(AuthGuard('jwt'), AbilitiesGuard)
-  async deletePropertyById(@Param('id') id: string): Promise<string> {
+  async deletePropertyById(@Param('id') id: string): Promise<JsonResponse> {
     await this.propertiesService.deleteProperty(id);
-    return 'Property Deleted';
+    return new JsonResponse(200, 'Property deleted');
   }
 }

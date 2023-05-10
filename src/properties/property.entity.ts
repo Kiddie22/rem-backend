@@ -25,6 +25,12 @@ export default class Property {
   @Column({ type: 'smallint' })
   noOfBathrooms: number;
 
-  @ManyToOne((_type) => User, (user) => user.properties, { eager: true })
-  user: User;
+  @Column()
+  isListed: boolean;
+
+  @ManyToOne((_type) => User, (user) => user.ownedProperties, { eager: true })
+  owner: User;
+
+  @ManyToOne((_type) => User, (user) => user.rentedProperties, { eager: true })
+  tenant: User;
 }

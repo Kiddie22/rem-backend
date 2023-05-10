@@ -5,6 +5,8 @@ import UsersService from 'src/users/users.service';
 import CreatePropertyDto from './dto/create-property.dto';
 import UpdatePropertyDto from './dto/update-property.dto';
 import Property from './property.entity';
+import FilterPropertiesDto from './dto/filter-properties.dto';
+import createPropertyQB from './utils/property-query-builder';
 
 @Injectable()
 export default class PropertiesService {
@@ -21,15 +23,23 @@ export default class PropertiesService {
     const user = await this.usersService.getUserById(userId);
     const property = this.propertiesRepository.create({
       ...createPropertyDto,
-      user,
+      owner: user,
+      tenant: null,
+      isListed: false,
     });
     await this.propertiesRepository.save(property);
     return property;
   }
 
-  async getUsersProperties(userId: string): Promise<Property[]> {
-    const user = await this.usersService.getUserById(userId);
-    return this.propertiesRepository.findBy({ user });
+  async getProperties(
+    filterPropertiesDto: FilterPropertiesDto,
+  ): Promise<Property[]> {
+    const queryBuilder = createPropertyQB(
+      this.propertiesRepository,
+      filterPropertiesDto,
+    );
+    const properties = await queryBuilder.getMany();
+    return properties;
   }
 
   async getPropertyById(propertyId: string): Promise<Property> {
@@ -57,5 +67,12 @@ export default class PropertiesService {
   async deleteProperty(propertyId: string): Promise<void> {
     const property = await this.getPropertyById(propertyId);
     this.propertiesRepository.remove(property);
+  }
+
+  static checkTenantExists(property: Property): boolean {
+    if (property.tenant) {
+      return true;
+    }
+    return false;
   }
 }

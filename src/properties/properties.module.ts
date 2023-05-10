@@ -10,5 +10,6 @@ import Property from './property.entity';
   imports: [TypeOrmModule.forFeature([Property]), AuthModule, UsersModule],
   providers: [PropertiesService],
   controllers: [PropertiesController],
+  exports: [PropertiesService, AuthModule, UsersModule],
 })
 export default class PropertiesModule {}

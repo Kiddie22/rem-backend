@@ -17,6 +17,13 @@ export default class User {
   @Exclude({ toPlainOnly: true })
   password: string;
 
-  @OneToMany((_type) => Property, (property) => property.user, { eager: false })
-  properties: Property[];
+  @OneToMany((_type) => Property, (property) => property.owner, {
+    eager: false,
+  })
+  ownedProperties: Property[];
+
+  @OneToMany((_type) => Property, (property) => property.tenant, {
+    eager: false,
+  })
+  rentedProperties: Property[];
 }
