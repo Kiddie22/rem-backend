@@ -11,6 +11,9 @@ COPY package*.json ./
 # Install all dependencies
 RUN npm install
 
+# Set environment variable
+ENV NODE_ENV=development
+
 # Bundle app source
 COPY . .
 
