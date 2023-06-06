@@ -1,12 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
-import { config } from 'dotenv';
 import AppModule from './app.module';
 import TransformInterceptor from './transform.interceptor';
 
 async function bootstrap(): Promise<void> {
-  config();
   const app = await NestFactory.create(AppModule);
   app.enableCors({
     origin: 'http://localhost:3001',
